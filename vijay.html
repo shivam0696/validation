@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Form Validation</title>
+    <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery Validation plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.js"></script>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            margin-right:5px
+        }
+        input.error {
+            border-color: red;
+        }
+        input.valid {
+            border-color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <form id="myForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" placeholder="vijay"><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" placeholder="vijay@gmail.com"><br><br>
+        
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" name="phone" maxlenth="15"  pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"  placeholder="1234567898"><br><br>
+
+        <label for="img">Image:</label>
+        <input type="file" id="img" name="img" accept="image/*" ><br><br>
+
+  
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            // Custom validation method for image file types
+            $.validator.addMethod("validImage", function(value, element) {
+                return this.optional(element) || /\.(jpg|jpeg|png|gif)$/i.test(value);
+            }, "Please upload a valid image file (jpg, jpeg, png, gif).");
+
+            // Custom validation method for phone number (including optional country code)
+            $.validator.addMethod("validPhone", function(value, element) {
+                return this.optional(element) || /^\+?\d{10,15}$/.test(value);
+            }, "Please enter a valid phone number (10-15 digits, with optional + for country code).");
+             // Custom validation method for image size between 20KB and 80KB
+            $.validator.addMethod("fileSize", function(value, element) {
+                if (element.files.length === 0) return true;
+                var fileSize = element.files[0].size;
+                return fileSize >= 20480 && fileSize <= 81920; // Size in bytes
+            }, "Please upload an image between 20KB and 80KB.");
+
+
+            // Validate the form
+            $("#myForm").validate({
+                rules: {
+                    name: {
+                        required: true,
+                        minlength: 5,
+                        maxlength: 50
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    img: {
+                        required: true,
+                        validImage: true,
+                        fileSize: true
+                        
+                    },
+                    phone: {
+                        required: true,
+                        validPhone: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter your name.",
+                        minlength: "Your name must be at least 2 characters long.",
+                        maxlength: "Your name must be less than 50 characters."
+                    },
+                    email: {
+                        required: "Please enter your email address.",
+                        email: "Please enter a valid email address."
+                    },
+                    img: {
+                        required: "Please upload an image.",
+                        validImage: "Please upload a valid image file (jpg, jpeg, png, gif).",
+                        fileSize: "Image size must be between 20KB and 80KB."
+                    },
+                    phone: {
+                        required: "Please enter your phone number.",
+                        validPhone: "Please enter a valid phone number (10-15 digits, with optional + for country code)."
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    error.insertAfter(element);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass(errorClass).removeClass(validClass);
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass(errorClass).addClass(validClass);
+                },
+               
+            });
+        });
+    </script>
+
+</body>
+</html>
